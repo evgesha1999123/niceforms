@@ -21,7 +21,10 @@ class DateWidget(BaseValueWidget):
         assert self._btn is not None, 'btn is not initialized'
         return self._btn
     
-    def fill(self, data: date | str) -> None:
+    def fill(self, data: date | str | None) -> None:
+        if data is None:
+            return
+        
         assert isinstance(data, date | str), 'incorrect data type: {}'.format(
             type(data)
         )
@@ -94,7 +97,10 @@ class DateTimeWidget(BaseWidget):
         assert self._btn is not None, 'btn is not initialized'
         return self._btn
     
-    def fill(self, data: datetime | str) -> None:
+    def fill(self, data: datetime | str | None) -> None:
+        if data is None:
+            return
+        
         assert isinstance(data, (datetime, str)), 'incorrect data type: {}'.format(
             type(data)
         )
@@ -162,6 +168,7 @@ class DateTimeWidget(BaseWidget):
         self.date_input.set_enabled(value)
         self.time_input.set_enabled(value)
         self.btn.set_enabled(value)
+        self.label.close_button.set_visibility(value)
     
     def render(self) -> Element:
         with ui.row().classes("w-full").style(

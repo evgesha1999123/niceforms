@@ -4,17 +4,20 @@ from nicegui.element import Element
 from pydantic import BaseModel
 
 from niceforms import BaseWidget
-from ...utils import extract_inner_type
 from .component import ListComponent
+from ...utils import extract_inner_type
 
 
 class ListBaseModelWidget(BaseWidget):
     
     def __init__(
-        self, title_getter: Optional[Callable[[BaseModel], str]] = None, **kwargs: dict
+        self, title_getter: Optional[Callable[[BaseModel], str]] = None, **kwargs: Any
     ) -> None:
         super().__init__(**kwargs)
+        print(kwargs)
         self.title_getter = title_getter
+        self.view_type_error_message = kwargs.get('view_type_error_message', True)
+        self.view_annotation_type = kwargs.get('view_annotation_type', True)
         self._model_type = None
         self._component: Optional[ListComponent[BaseModel]] = None
 
@@ -25,10 +28,11 @@ class ListBaseModelWidget(BaseWidget):
         self._form = BaseModelForm(
             model=self.model_type,
             title=None,
-            view_annotation_type=False,
+            view_annotation_type=self.view_annotation_type,
             view_clear_button=False,
             view_json_button=False,
             view_submit_button=False,
+            view_type_error_message=self.view_type_error_message,
         )
 
     @property
@@ -108,4 +112,5 @@ class ListBaseModelWidget(BaseWidget):
         return el
     
     def set_enabled(self, value: bool) -> None:
-        pass
+        self.component.add_button.set_visibility(value)
+        self.label.close_button.set_visibility(value)

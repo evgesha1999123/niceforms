@@ -100,9 +100,11 @@ class BaseModelForm(UIComponent, Generic[T]):
             kwargs=kwargs,
         )
 
-    def fill(self, data: dict[str, Any]) -> None:
+    def fill(self, data: dict[str, Any] | None) -> None:
         """Наполнить виджеты данными"""
-
+        if data is None:
+            return
+        
         for field_name, value in data.items():
             if w := self.widgets.get(field_name):
                 w.fill(value)

@@ -117,6 +117,7 @@ class WidgetFactory:
         kwargs: Optional[dict] = None,
     ) -> BaseWidget:
         kwargs = kwargs or {}
+        kwargs.update(view_annotation_type=self.view_annotation_type, view_type_error_message=self.view_type_error_message)
         field_info = self.fields[field_name]
 
         if widget_type:

@@ -11,6 +11,8 @@ class NestedWidget(BaseWidget):
     def __init__(self, **kwargs) -> None:
         super().__init__(**kwargs)
         self.model = self.normalized_type.origin_type
+        self.view_type_error_message = kwargs.get('view_type_error_message', True)
+        
         from niceforms import BaseModelForm
 
         self._form = BaseModelForm(
@@ -22,6 +24,7 @@ class NestedWidget(BaseWidget):
             view_json_button=False,
             view_annotation_type=self.view_annotation_type,
             view_clear_button=False,
+            view_type_error_message=self.view_type_error_message,
             _is_nullable=self.normalized_type.is_nullable,
         )
         self._form._is_nested = True
@@ -40,7 +43,7 @@ class NestedWidget(BaseWidget):
         self.form.body_element.style('height: 100px')
         return Element()
 
-    def fill(self, data: Any) -> None:
+    def fill(self, data: Any | None) -> None:
         self.form.fill(data)
 
     def validate(self) -> Optional[str]:

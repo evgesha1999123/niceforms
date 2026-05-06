@@ -2,10 +2,11 @@
 
 import logging
 from abc import ABC, abstractmethod
-from typing import Any, Optional, Callable, Union
+from typing import Any, Optional, Callable, Union, Self
 
 from nicegui import ui
 from nicegui.element import Element
+from nicegui.elements.button import Button
 from nicegui.elements.mixins.disableable_element import DisableableElement
 from nicegui.elements.mixins.text_element import TextElement
 from nicegui.elements.mixins.validation_element import ValidationElement
@@ -22,7 +23,7 @@ UnionElement = Union[Element, ValueElement, ValidationElement]
 
 class WidgetLabel(UIComponent):
     LEFT_PEDDING_PX: int = 7
-
+    
     def __init__(
         self,
         field_info: FieldInfo,
@@ -36,13 +37,21 @@ class WidgetLabel(UIComponent):
         self.normalized_type = normalized_type
         self.view_annotation_type = view_annotation_type
         self.on_clear = on_clear
-
+        
+        self._close_button: Optional[Button] = None
+    
+    @property
+    def close_button(self) -> Button:
+        if not self._close_button:
+            raise ValueError('Not rendered yet')
+        return self._close_button
+    
     def render(self) -> None:
         text = self.field.title if self.field.title else self.field_name.title()
-
+        
         with ui.row().classes('mb-1 items-baseline justify-between w-full gap-1'):
             with ui.row().classes('items-baseline gap-1').style(
-                f'padding-left: {self.LEFT_PEDDING_PX}px;'
+                    f'padding-left: {self.LEFT_PEDDING_PX}px;'
             ):
                 ui.label(text=text).classes('font-medium text-base')
                 if not self.normalized_type.is_nullable:
@@ -51,15 +60,15 @@ class WidgetLabel(UIComponent):
                     ui.label(text=f' [{self.field.annotation}]').classes(
                         'text-gray-400 text-md font-normal'
                     )
-
-            (
+            
+            self._close_button = (
                 ui.button(icon='close', color='secondary')
                 .on_click(self.on_clear)
                 .props('flat dense round')
                 .classes('text-xs opacity-30 hover:opacity-80 transition-opacity')
                 .tooltip('Очистить')
             )
-
+        
         if self.field.description:
             ui.label(text=self.field.description).classes("mb-1 text-gray-500").style(
                 f'padding-left: {self.LEFT_PEDDING_PX}px;'
@@ -74,7 +83,7 @@ class BaseWidget(UIComponent, ABC):
         field_info: FieldInfo,
         field_name: str,
         view_annotation: bool,
-        **kwargs: dict,
+        **kwargs: Any,
     ):
         self.kwargs = kwargs
 
@@ -87,12 +96,14 @@ class BaseWidget(UIComponent, ABC):
         self._rendered_element: Optional[Element] = None
         self._error_label: Optional[TextElement] = None
         self._error_icon: Optional[Element] = None
+        self._label: Optional[WidgetLabel] = None
+        
         from .. import BaseModelForm
 
         self._form: Optional[BaseModelForm] = None
 
     @abstractmethod
-    def fill(self, data: Any) -> None:
+    def fill(self, data: Optional[Any]) -> None:
         """Вызывается, когда в BaseModelForm вызывают метод .fill()"""
         raise NotImplementedError()
 
@@ -126,7 +137,13 @@ class BaseWidget(UIComponent, ABC):
             self._form is not None
         ), f"Current widget {self.__class__.__name__} does not support form within himself"
         return self._form
-
+    
+    @property
+    def label(self) -> WidgetLabel:
+        if self._label is None:
+            raise ValueError('Not rendered yet')
+        return self._label
+    
     @property
     def element(self) -> Element:
         assert self._rendered_element is not None, 'Widget has not been rendered yet.'
@@ -159,13 +176,14 @@ class BaseWidget(UIComponent, ABC):
         self._error_icon.set_visibility(False)
 
     def render_label(self) -> None:
-        WidgetLabel(
+        self._label = WidgetLabel(
             field_info=self.field,
             field_name=self.field_name,
             normalized_type=self.normalized_type,
             view_annotation_type=self.view_annotation_type,
             on_clear=self.clear,
-        ).render()
+        )
+        self.label.render()
 
     def view_error(self, error: str) -> None:
         if self._error_label:
@@ -222,13 +240,14 @@ class BaseValueWidget(BaseWidget, ABC):
         
         el: DisableableElement = self.element  # type: ignore
         el.set_enabled(value)
+        self.label.close_button.set_visibility(value)
         
         
     @property
     def element(self) -> ValueElement:
         return super().element  # type: ignore
 
-    def fill(self, data: Any) -> None:
+    def fill(self, data: Optional[Any]) -> None:
         """Вызывается, когда в BaseModelForm вызывают метод .fill()"""
         self.element.set_value(data)
 

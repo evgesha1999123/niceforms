@@ -2,6 +2,7 @@ from typing import Optional, Callable, Generic
 
 from nicegui import ui
 from nicegui.element import Element
+from nicegui.elements.button import Button
 from nicegui.elements.dialog import Dialog
 
 from .action import *
@@ -90,11 +91,19 @@ class ListComponent(UIComponent, Generic[T]):
         self.dialog: Optional[Dialog] = None
         self.current_user = None
         self.is_edit_mode: bool = False
+        
+        self._add_button: Optional[Button] = None
 
         from niceforms import BaseModelForm
 
         self.form: BaseModelForm[T] = form
-
+        
+    @property
+    def add_button(self) -> Button:
+        if not self._add_button:
+            raise ValueError('Not rendered yet')
+        
+        return self._add_button
     def ensure_title(self, model: BaseModel, number: int) -> str:
         text = self.record_title_getter(model)
         return text if text is not None else f'Запись №{number}'
@@ -107,7 +116,7 @@ class ListComponent(UIComponent, Generic[T]):
             self.refresh_list()
 
             # Кнопка добавления
-            ui.button('Добавить', on_click=self.show_add_dialog)
+            self._add_button = ui.button('Добавить', on_click=self.show_add_dialog)
         return column
 
     def refresh_list(self):

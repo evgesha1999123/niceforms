@@ -36,10 +36,12 @@ class Status(str, Enum):
 class Address(BaseModel):
     street: str
     city: str
+    index: str | int
 
 class Person(BaseModel):
     name: str
     age: int
+    index: str | int
 
 class UserForm(BaseModel):
     """User form model for demonstration."""
@@ -69,7 +71,7 @@ async def disable_widget() -> None:
         async def submit_handler(model: UserForm):
             print(f"Пользователь создан: {model}")
 
-        form = BaseModelForm(UserForm, on_submit=submit_handler, view_type_error_message=False)
+        form = BaseModelForm(UserForm, on_submit=submit_handler, view_type_error_message=False, view_annotation_type=False)
         form.render()
         form.set_enabled(False)
         form.fill({'created_at': datetime.datetime.now()})
