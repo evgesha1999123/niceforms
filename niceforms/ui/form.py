@@ -9,6 +9,7 @@ from typing import (
 )
 
 from nicegui import ui
+from nicegui.event import Event
 from nicegui.element import Element
 from nicegui.elements.card import Card
 from nicegui.elements.dialog import Dialog
@@ -30,6 +31,9 @@ from ..widget import BaseWidget
 
 logger = logging.getLogger(__name__)
 
+class EventGroup(Generic[T]):
+    def __init__(self) -> None:
+        self.submit = Event[T]()
 
 class NestedForm(BaseModel):
     model_config = ConfigDict(arbitrary_types_allowed=True)
@@ -57,6 +61,7 @@ class BaseModelForm(UIComponent, Generic[T]):
         self.factory = WidgetFactory(
             model, view_annotation_type, view_type_error_message
         )
+        self.event = EventGroup[T]()
 
         self.model = model
         self.on_submit = on_submit
@@ -107,14 +112,15 @@ class BaseModelForm(UIComponent, Generic[T]):
         self.header: Optional[Header] = None
 
     async def submit(self) -> None:
+        try:
+            base_model = self.build_model()
+        except FormError:
+            return
+
+        self.event.submit.emit(base_model)
+
         if self.on_submit is not None:
-            try:
-                base_model = self.build_model()
-            except FormError:
-                return
-
             result = self.on_submit(base_model)
-
             import inspect
 
             if inspect.isawaitable(result):
