@@ -23,7 +23,7 @@ class AddDialog(UIComponent):
         with ui.dialog() as dialog:
             with ui.card().classes('w-full'):
                 self.form.title = 'Создать запись'
-                self.form.render(as_card=False, body_classes='w-full')
+                self.form.render(wrap='dialog')
 
                 with ui.row().classes('w-full justify-end gap-2 mt-4'):
                     ui.button('Отмена', on_click=dialog.close).props('flat')
@@ -54,23 +54,26 @@ class EditDialog(UIComponent):
         self.form: BaseModelForm = form
 
     def render(self) -> Dialog:
-        with ui.dialog() as dialog:
-            with ui.card().classes('w-full'):
-                ui.label("Редактировать").classes('text-xl font-bold mb-4')
-
-                self.form.title = self.record_title_getter(self.model)
-                self.form.render(as_card=False, body_classes='w-full')
-                self.form.fill(data=self.model.model_dump())
-
-                with ui.row().classes('justify-end gap-2 mt-4'):
-                    ui.button('Отмена', on_click=dialog.close).props('flat')
-                    ui.button(
-                        'Сохранить',
-                        on_click=lambda: self.on_edit(
-                            model=self.form.build_model(), index=self.index
-                        ),
-                    ).props('color=primary')
-
+        # with ui.dialog() as dialog:
+        #     with ui.card().classes('w-full'):
+        #         ui.label("Редактировать").classes('text-xl font-bold mb-4')
+        #
+        #         self.form.title = self.record_title_getter(self.model)
+        #         self.form.render(wrap='dialog')
+        #         self.form.fill(data=self.model.model_dump())
+        #
+        #         with ui.row().classes('justify-end gap-2 mt-4'):
+        #             ui.button('Отмена', on_click=dialog.close).props('flat')
+        #             ui.button(
+        #                 'Сохранить',
+        #                 on_click=lambda: self.on_edit(
+        #                     model=self.form.build_model(), index=self.index
+        #                 ),
+        #             ).props('color=primary')
+        
+        self.form.title = self.record_title_getter(self.model)
+        dialog = self.form.render(wrap='dialog')
+        self.form.fill(data=self.model.model_dump())
         return dialog
 
 
@@ -108,16 +111,16 @@ class ViewDialog(UIComponent):
         from niceforms import BaseModelForm
 
         self.form: BaseModelForm = form
+        
+        
 
     def render(self) -> Dialog:
-        with ui.dialog() as dialog:
-            with ui.card().classes('w-full'):
-
-                self.form.title = self.record_title_getter(self.model)
-                self.form.render(as_card=False, body_classes='w-full')
-                self.form.fill(data=self.model.model_dump())
-
-                with ui.row().classes('w-full justify-end gap-2 mt-4'):
-                    ui.button('Закрыть', on_click=dialog.close).props('flat')
+        self.form.title = self.record_title_getter(self.model)
+        dialog = self.form.render(wrap='dialog')
+        
+        self.form.fill(data=self.model.model_dump())
+        
+        for w in self.form.widgets.values():
+            w.set_enabled(False)
 
         return dialog
