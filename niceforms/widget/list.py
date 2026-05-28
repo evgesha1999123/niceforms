@@ -26,15 +26,31 @@ class ListWidget(BaseValidationWidget):
         return None
 
     def render(self) -> ValidationElement:
-        default_value = (
-            json.dumps(self.default_value) if self.default_value is not None else None
-        )
+        if self.default_value is None:
+            default_value = None
+
+        elif isinstance(self.default_value, str):
+            # строку не сериализуем повторно
+            default_value = self.default_value
+
+        else:
+            # dict/list/int/bool/etc -> JSON строка
+            default_value = json.dumps(
+                self.default_value,
+                ensure_ascii=False,
+                indent=2,
+            )
 
         def decode_validate(v) -> bool:
+            if not v:
+                return True
+
             try:
-                if v:
-                    json.loads(v)
-            except json.decoder.JSONDecodeError:
+                json.loads(v)
+            except (
+                    json.decoder.JSONDecodeError,
+                    TypeError,
+            ):
                 return False
 
             return True
@@ -53,16 +69,27 @@ class ListWidget(BaseValidationWidget):
             .props("outlined dense")
             .classes("w-full font-mono")
         )
+
         # Контейнер для лейбла и иконки
         with ui.row().classes('items-center gap-1'):
-            ui.label(text=f'Строка парсится как JSON').classes('text-xs mt-1')
+            ui.label(
+                text='Строка парсится как JSON'
+            ).classes('text-xs mt-1')
+
             normalized_type = normalize_type(self.field.annotation)
 
             example = self.type_tip_map.get(normalized_type.origin_type)
+
             if example is not None:
-                # Иконка с подсказкой при наведении
-                ui.icon('info', size='xs').classes('cursor-help mt-1').tooltip(
+                ui.icon(
+                    'info',
+                    size='xs',
+                ).classes(
+                    'cursor-help mt-1'
+                ).tooltip(
                     f'Пример ввода: {example}'
-                ).style('color: #8989ff')
+                ).style(
+                    'color: #8989ff'
+                )
 
         return el
