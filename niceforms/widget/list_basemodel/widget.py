@@ -14,7 +14,6 @@ class ListBaseModelWidget(BaseWidget):
         self, title_getter: Optional[Callable[[BaseModel], str]] = None, **kwargs: Any
     ) -> None:
         super().__init__(**kwargs)
-        print(kwargs)
         self.title_getter = title_getter
         self.view_type_error_message = kwargs.get('view_type_error_message', True)
         self.view_annotation_type = kwargs.get('view_annotation_type', True)

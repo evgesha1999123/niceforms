@@ -35,13 +35,13 @@ class RecipeDTO(BaseModel):
 
 
 class PatientCardDTO(BaseModel):
-    recipe: Optional[RecipeDTO] | None = Field(None, title='Рецепты')
+    recipe: list[RecipeDTO] = Field(title='Рецепты')
+    name: str
 
 
 @router.page('/')
 def page() -> None:
     with ui.column().classes('w-full max-w-xl mx-auto'):
-
 
         form = BaseModelForm[PatientCardDTO](
             PatientCardDTO,
@@ -50,9 +50,20 @@ def page() -> None:
             view_type_error_message=False,
         )
         form.render()
-        form.fill({'recipe': [RecipeDTO(evnrecept_id=0, evnrecept_num='12', evnrecept_setdt=date.today()).model_dump()]})
+        form.fill(
+            {
+                'recipe': [
+                    RecipeDTO(
+                        evnrecept_id=0, evnrecept_num='12', evnrecept_setdt=date.today()
+                    ).model_dump(),
+                    RecipeDTO(
+                        evnrecept_id=5, evnrecept_num='13', evnrecept_setdt=date.today()
+                    ).model_dump(),
+                ]
+            }
+        )
 
 
 app.include_router(router)
 
-ui.run()
+ui.run(show=False, reload=False)

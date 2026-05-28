@@ -16,7 +16,7 @@ from nicegui.elements.dialog import Dialog
 from pydantic import BaseModel, ConfigDict, ValidationError
 from pydantic.fields import FieldInfo
 
-from .button import FormButton
+from .button import FormButton, PositiveButton, DefaultButton
 from .json_viewer import JsonDialog
 from .ui_component import UIComponent
 from ..actions import OnSubmit
@@ -74,27 +74,17 @@ class BaseModelForm(UIComponent, Generic[T]):
 
         self.fields: dict[str, FieldInfo] = self.model.model_fields  # type: ignore # field_name: FieldInfo
         self.buttons: dict[str, FormButton] = {
-            "clear": FormButton(
+            "clear": DefaultButton(
                 text="Очистить",
                 on_click=self.clear,
-                bg_color='gray',
-                classes='px-8',
-                style='color: gray',
             ),
-            "json": FormButton(
+            "json": DefaultButton(
                 text="Показать json",
                 on_click=self.render_json_viewer_dialog,
-                bg_color='gray',
-                classes='px-8',
-                style='color: gray',
             ),
-            "submit": FormButton(
+            "submit": PositiveButton(
                 text="Отправить",
                 on_click=self.submit,
-                bg_color='green',
-                classes='px-12',
-                color_weight=500,
-                style='color: white',
             ),
         }
 

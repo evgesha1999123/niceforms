@@ -7,6 +7,7 @@ from nicegui.elements.dialog import Dialog
 
 from .action import *
 from .dialog import AddDialog, ConfirmDeleteDialog, EditDialog, ViewDialog
+from ...ui.button import PositiveButton
 from ...ui.ui_component import UIComponent
 from ...utils import T
 
@@ -48,16 +49,20 @@ class RecordLine(UIComponent):
 
     def render(self) -> None:
         with ui.row().classes(
-            'w-full justify-between items-center p-2 bg-gray-50 rounded'
+            'w-full justify-between items-center p-2 bg-gray-50 rounded-xl'
         ):
-            ui.label(f"{self.number}. {self.title}").classes('text-lg')
+            ui.label(f"{self.number}. {self.title}").classes('text-lg ml-4')
 
             with ui.row().classes('gap-1'):
                 # Кнопка "Показать" с иконкой visibility
                 ui.button(
                     icon='visibility',
                     on_click=lambda: self.on_view(self.model),
-                ).props('flat').classes('hover:bg-blue-50').tooltip('Показать')
+                ).props('flat round').classes('hover:bg-blue-50').props(
+                    'size=0.75rem'
+                ).tooltip(
+                    'Показать'
+                )
 
                 # Кнопка "Редактировать" с иконкой edit
                 ui.button(
@@ -65,7 +70,11 @@ class RecordLine(UIComponent):
                     on_click=lambda: self.on_edit(
                         model=self.model, index=self.list_index
                     ),
-                ).props('flat').classes('hover:bg-orange-50').tooltip('Редактировать')
+                ).props('flat round').classes('hover:bg-orange-50').props(
+                    'size=0.75rem'
+                ).tooltip(
+                    'Редактировать'
+                )
 
                 # Кнопка "Удалить" с иконкой delete
                 ui.button(
@@ -73,7 +82,9 @@ class RecordLine(UIComponent):
                     on_click=lambda: self.on_delete(
                         model=self.model, index=self.list_index
                     ),
-                ).props('flat color=negative').classes('hover:bg-red-50').tooltip(
+                ).props('flat round color=negative').classes('hover:bg-red-50').props(
+                    'size=0.75rem'
+                ).tooltip(
                     'Удалить'
                 )
 
@@ -116,7 +127,7 @@ class ListComponent(UIComponent, Generic[T]):
             self.refresh_list()
 
             # Кнопка добавления
-            self._add_button = ui.button('Добавить', on_click=self.show_add_dialog)
+            self._add_button = PositiveButton("", on_click=self.show_add_dialog, icon='add', classes='w-full').render()
         return column
 
     def refresh_list(self):
@@ -188,6 +199,7 @@ class ListComponent(UIComponent, Generic[T]):
         dialog = ConfirmDeleteDialog(
             on_confirm=confirm_delete,
             record_title=self.ensure_title(model, index + 1),
+            wrapper_classes=self.form.wrapper_classes,
         ).render()
 
         dialog.open()
