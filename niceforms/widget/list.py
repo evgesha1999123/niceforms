@@ -1,5 +1,5 @@
 import json
-from typing import List, Optional, Union
+from typing import List, Optional, Union, Any
 
 from nicegui import ui
 from nicegui.elements.mixins.validation_element import ValidationElement
@@ -25,21 +25,28 @@ class ListWidget(BaseValidationWidget):
 
         return None
 
-    def render(self) -> ValidationElement:
-        if self.default_value is None:
-            default_value = None
+    @staticmethod
+    def _prepare_data(data: Optional[Any]) -> str | None:
+        if data is None:
+            value = None
 
-        elif isinstance(self.default_value, str):
-            # строку не сериализуем повторно
-            default_value = self.default_value
+        elif isinstance(data, str):
+            value = data
 
         else:
-            # dict/list/int/bool/etc -> JSON строка
-            default_value = json.dumps(
-                self.default_value,
+            value = json.dumps(
+                data,
                 ensure_ascii=False,
                 indent=2,
             )
+        return value
+
+    def fill(self, data: Optional[Any]) -> None:
+        self.element.set_value(self._prepare_data(data))
+
+    def render(self) -> ValidationElement:
+        default_value = self._prepare_data(self.default_value)
+
 
         def decode_validate(v) -> bool:
             if not v:
