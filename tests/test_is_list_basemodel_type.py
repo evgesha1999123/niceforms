@@ -2,7 +2,8 @@ from typing import Optional
 
 import pytest
 from pydantic import BaseModel
-from utils import is_list_basemodel_type
+
+from niceforms.utils import is_list_basemodel_type
 
 
 class Person(BaseModel):
