@@ -119,17 +119,21 @@ class Header(UIComponent):
         )
 
         with self._main_container:
-            # Контейнер для заголовка и кнопок
-            with ui.element().classes("flex justify-between items-start"):
+            with ui.element().classes("flex justify-between items-start gap-4"):
+                # Ограничиваем ширину заголовка
                 if self.is_nested:
-                    label_classes = "text-base font-bold text-white"
+                    label_classes = (
+                        "text-base font-bold text-white truncate flex-1 min-w-0"
+                    )
                 else:
-                    label_classes = "text-2xl font-bold text-white"
+                    label_classes = (
+                        "text-2xl font-bold text-white truncate flex-1 min-w-0"
+                    )
 
                 ui.label(self.title).classes(label_classes)
 
-                # Контейнер для иконок справа
-                with ui.element().classes("flex gap-2 items-center"):
+                # Контейнер для иконок (не сжимается)
+                with ui.element().classes("flex gap-2 items-center flex-shrink-0"):
                     # Иконка подсказки (только для невложенных)
                     if not self.is_nested:
                         with ui.element().classes("cursor-help"):

@@ -60,7 +60,7 @@ class User(BaseModel):
     appearance: Appearance = Field(
         ..., title="Внешний вид", description="Отличительные черты персоны"
     )
-    relationship: Relationship = Field(title="Оооочень длинный заголовок, который не вмещается в шапку")
+    relationship: Relationship = Field(title="Оооочень длинный заголовок, который не вмещается в шапку/ Оооочень длинный заголовок, который не вмещается в шапку/")
 
 
 @router.page('/nested')
