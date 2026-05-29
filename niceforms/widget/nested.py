@@ -19,6 +19,7 @@ class NestedWidget(BaseWidget):
         self._form = BaseModelForm(
             model=self.model,
             title=self.field.title if self.field.title else self.field_name.title(),
+            description=self.field.description if self.field.description else None,
             header_bg_color=self.nested_header_bg_color,
             on_submit=None,
             _is_nullable=self.normalized_type.is_nullable,

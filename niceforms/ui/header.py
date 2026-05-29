@@ -4,6 +4,7 @@ from typing import Optional
 from nicegui import ui
 from nicegui.element import Element
 from nicegui.elements.button import Button
+from nicegui.elements.label import Label
 from nicegui.elements.mixins.name_element import NameElement
 
 from .body import Body
@@ -33,6 +34,7 @@ class Header(UIComponent):
         self.bg_color = bg_color
 
         self.is_expanded = True
+        self._title: Optional[Label] = None
         self._button: Optional[Button] = None
         self._description: Optional[Element] = None
         self._expand_icon: Optional[NameElement] = None
@@ -94,6 +96,8 @@ class Header(UIComponent):
         return self._is_none
 
     def toggle_expand_parent(self) -> None:
+        self._title.classes(toggle='truncate')
+
         if self.is_expanded:
             self.body.root.set_visibility(False)
             self.is_expanded = False
@@ -123,14 +127,14 @@ class Header(UIComponent):
                 # Ограничиваем ширину заголовка
                 if self.is_nested:
                     label_classes = (
-                        "text-base font-bold text-white truncate flex-1 min-w-0"
+                        "text-base font-bold text-white flex-1 min-w-0"
                     )
                 else:
                     label_classes = (
-                        "text-2xl font-bold text-white truncate flex-1 min-w-0"
+                        "text-2xl font-bold text-white flex-1 min-w-0"
                     )
 
-                ui.label(self.title).classes(label_classes)
+                self._title = ui.label(self.title).classes(label_classes)
 
                 # Контейнер для иконок (не сжимается)
                 with ui.element().classes("flex gap-2 items-center flex-shrink-0"):
@@ -167,7 +171,7 @@ class Header(UIComponent):
                         self._expand_icon.on('click', self.toggle_expand_parent)
 
                     self._error_icon = (
-                        ui.icon('error_outline', size="md")
+                        ui.icon('error_outline', size="sm")
                         .classes(
                             "cursor-help text-red-400 hover:text-red-300 "
                             "transition-all duration-200"

@@ -36,31 +36,36 @@ class Address(BaseModel):
     city: str
     coordinates: Coordinates
 
+
 class Person(BaseModel):
     """Some description"""
+
     name: str
     age: int
 
+
 class Relationship(BaseModel):
     users: list[Person]
+
 
 class Appearance(BaseModel):
     """Appearance"""
 
     hair: str
-    color: str
+    height: int
 
 
-class User(BaseModel):
+class User(Person):
     """Some description"""
 
-    name: str
-    age: int
     address: Optional[Address]
     appearance: Appearance = Field(
         ..., title="Внешний вид", description="Отличительные черты персоны"
     )
-    relationship: Relationship = Field(title="Оооочень длинный заголовок, который не вмещается в шапку/ Оооочень длинный заголовок, который не вмещается в шапку/")
+    relationship: Relationship = Field(
+        title="Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+        description='Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo. Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed quia consequuntur magni dolores eos qui ratione voluptatem sequi nesciunt. Neque porro quisquam est, qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit, sed quia non numquam eius modi tempora incidunt ut labore et dolore magnam aliquam quaerat voluptatem.',
+    )
 
 
 @router.page('/nested')
