@@ -24,10 +24,11 @@ class Body:
         with ui.column().classes(f"w-full p-1 sm:p-4 gap-[0px]") as self._root:
             for w in self.widgets:
 
-                with ui.element().classes(f"w-full"):
+                with ui.element().classes(f"w-full") as container:
                     w.render_label()
                     el = w.render()
                     w.set_element(el)
+                    w.set_container(container)
 
                     if not isinstance(w, BaseValidationWidget):
                         w.render_error()
