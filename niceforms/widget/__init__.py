@@ -95,6 +95,7 @@ class BaseWidget(UIComponent, ABC):
         self._error_label: Optional[TextElement] = None
         self._error_icon: Optional[Element] = None
         self._label: Optional[WidgetLabel] = None
+        self._container: Optional[Element] = None
         
         from .. import BaseModelForm
 
@@ -148,6 +149,12 @@ class BaseWidget(UIComponent, ABC):
         return self._rendered_element
 
     @property
+    def container(self) -> Element:
+        if not self._container:
+            raise ValueError('Widget has not been rendered yet.')
+        return self._container
+
+    @property
     def placeholder(self) -> str:
         return (
             f"Введите {self.field.title.lower()}"
@@ -160,6 +167,12 @@ class BaseWidget(UIComponent, ABC):
         return (
             self.field.default if self.field.default is not PydanticUndefined else None
         )
+
+    def set_container(self, container: Element) -> None:
+        self._container = container
+
+    def set_visibility(self, value: bool) -> None:
+        self.container.set_visibility(value)
 
     def render_error(self) -> None:
 
