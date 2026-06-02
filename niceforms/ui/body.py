@@ -7,9 +7,10 @@ from niceforms.widget import BaseWidget, BaseValidationWidget
 
 
 class Body:
-    def __init__(self, widgets: list[BaseWidget]) -> None:
+    def __init__(self, widgets: list[BaseWidget], body_element_classes: str) -> None:
         self.widgets = widgets
         self._root: Optional[Element] = None
+        self._body_element_classes = body_element_classes
 
     @property
     def root(self) -> Element:
@@ -21,7 +22,7 @@ class Body:
     def render(self) -> Element:
         widgets = []
 
-        with ui.column().classes(f"w-full p-1 sm:p-4 gap-[0px]") as self._root:
+        with ui.column().classes(self._body_element_classes) as self._root:
             for w in self.widgets:
 
                 with ui.element().classes(f"w-full") as container:

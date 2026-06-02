@@ -121,6 +121,12 @@ class BaseModelForm(UIComponent, Generic[T]):
 
                 По умолчанию:
                     "#747dff"
+
+            body_element_classes (str):
+                Классы html для body элемента
+
+                По умолчанию:
+                    "w-full p-1 sm:p-4 gap-[0px]"
         """
         from ..widget_factory import WidgetFactory
 
@@ -294,6 +300,7 @@ class BaseModelForm(UIComponent, Generic[T]):
         with ui.element().classes('w-full') as self.root:
             self._body = Body(
                 widgets=list(self.widgets.values()),
+                body_element_classes=self.kwargs.get("body_element_classes", "w-full p-1 sm:p-4 gap-[0px]"),
             )
 
             self._header = Header(

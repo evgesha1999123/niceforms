@@ -6,6 +6,7 @@ from nicegui import APIRouter, ui
 from pydantic import BaseModel, Field
 
 from niceforms import BaseModelForm
+from .complex_type import Address
 
 router = APIRouter()
 
@@ -23,6 +24,7 @@ class User(BaseModel):
     surname: str = Field(..., description="Фамилия пользователя")
     height: Optional[int]
     style: Style = Style.Yellow
+    address: Address
 
 
 @router.page('/widget_visibility')
@@ -36,7 +38,7 @@ async def basic() -> None:
         async def submit_handler(model: User) -> None:
             print(f"Пользователь создан: {model}")
 
-        form = BaseModelForm(User, on_submit=submit_handler, view_annotation_type=False)
+        form = BaseModelForm(User, on_submit=submit_handler, view_annotation_type=False, body_element_classes="w-full p-0 sm:p-0 gap-[0px]")
         form.wrapper_classes = form.wrapper_classes + ' max-w-xl'
         form.render()
 
